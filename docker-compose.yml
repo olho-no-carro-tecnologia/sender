@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: poc-sender-app
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - poc-sender-network
+
+  db:
+    image: postgres:latest
+    container_name: poc-sender-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: meuprojeto
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - poc-sender-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: poc-sender-rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - poc-sender-network
+
+networks:
+  poc-sender-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
